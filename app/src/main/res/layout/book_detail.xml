@@ -1,0 +1,56 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context="org.upv.audiolibros.view.BookDetailFragment">
+
+    <TextView
+        android:id="@+id/book_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Kappa"
+        android:gravity="center"
+        style="?android:attr/textAppearanceLarge"
+        android:lines="2"/>
+
+    <TextView
+        android:id="@+id/book_author"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        tools:text="Akutagawa"
+        android:gravity="center"
+        android:lines="1"/>
+
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/book_cover"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:contentDescription="@string/img_desc_cover_image"
+        android:scaleType="fitCenter"
+        android:src="@drawable/kappa" />
+
+    <org.upv.audiolibros.customViews.ZoomSeekBar
+        android:id="@+id/zoom_seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        app:altoBar="40dp"
+        app:altoGuia="4dp"
+        app:altoNumeros="15dp"
+        app:altoPalanca="40dp"
+        app:altoRegla="10dp"
+        app:altoTexto="12dp"
+        app:anchoPalanca="10dp"
+        app:colorGuia="#FF9050"
+        app:colorPalanca="#FF0000"
+        app:colorRegla="#B0B070"
+        app:colorTexto="#00A0A0" />
+
+</LinearLayout>
