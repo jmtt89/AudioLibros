@@ -15,8 +15,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 
 import org.upv.audiolibros.R;
-import org.upv.audiolibros.database.BooksDatabase;
+
+import org.upv.audiolibros.controller.BooksController;
 import org.upv.audiolibros.model.Book;
+
 import java.util.List;
 
 public class BooksConfigureRecyclerViewAdapter extends RecyclerView.Adapter<BooksConfigureRecyclerViewAdapter.ViewHolder> {
@@ -24,9 +26,9 @@ public class BooksConfigureRecyclerViewAdapter extends RecyclerView.Adapter<Book
     private final List<Book> books;
     private final View.OnClickListener onBookSelected;
 
-    BooksConfigureRecyclerViewAdapter(ImageLoader imageLoader, BooksDatabase database, View.OnClickListener onBookSelected) {
+    BooksConfigureRecyclerViewAdapter(ImageLoader imageLoader, BooksController controller, View.OnClickListener onBookSelected) {
         this.imageLoader = imageLoader;
-        this.books = database.list();
+        this.books = controller.list();
         this.onBookSelected = onBookSelected;
     }
 

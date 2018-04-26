@@ -8,20 +8,23 @@ import android.preference.PreferenceManager;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 
+import org.upv.audiolibros.controller.BooksController;
 import org.upv.audiolibros.controller.NetworkController;
 import org.upv.audiolibros.database.BooksDatabase;
 import org.upv.audiolibros.database.BooksDatabaseSharedPref;
+import org.upv.audiolibros.libs.EventBus;
+import org.upv.audiolibros.libs.GreenRobotEventBus;
 
 public class AudioBooks extends Application {
     private static AudioBooks mInstance;
     private static Context mAppContext;
-    private BooksDatabase database;
+    private BooksController controller;
     private NetworkController networkController;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        database = new BooksDatabaseSharedPref(getApplicationContext());
+        controller = BooksController.getInstance(getApplicationContext());
         mInstance = this;
         this.setAppContext(getApplicationContext());
         networkController = NetworkController.getInstance();
@@ -31,8 +34,8 @@ public class AudioBooks extends Application {
         return mInstance;
     }
 
-    public BooksDatabase getDatabase(){
-        return database;
+    public BooksController getBooksController(){
+        return controller;
     }
 
     public static Context getAppContext() {
@@ -53,5 +56,13 @@ public class AudioBooks extends Application {
 
     public ImageLoader getImageLoader() {
         return networkController.getImageLoader();
+    }
+
+    public EventBus getEventBus() {
+        return new GreenRobotEventBus(org.greenrobot.eventbus.EventBus.getDefault());
+    }
+
+    public BooksDatabase getBooksDatabase() {
+        return BooksDatabaseSharedPref.getInstance(getAppContext());
     }
 }

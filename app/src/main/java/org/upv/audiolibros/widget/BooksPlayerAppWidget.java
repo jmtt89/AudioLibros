@@ -8,22 +8,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.Volley;
 
 import org.upv.audiolibros.R;
+import org.upv.audiolibros.controller.BooksController;
 import org.upv.audiolibros.controller.NetworkController;
-import org.upv.audiolibros.database.BooksDatabase;
-import org.upv.audiolibros.database.BooksDatabaseSharedPref;
 import org.upv.audiolibros.model.Book;
+import org.upv.audiolibros.service.AudioService;
+import org.upv.audiolibros.view.list.ui.BookListActivity;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -82,7 +78,7 @@ public class BooksPlayerAppWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         Context appContext = context.getApplicationContext();
         SharedPreferences pref = appContext.getSharedPreferences("WIDGET_SELECTOR", MODE_PRIVATE);
-        BooksDatabase database = new BooksDatabaseSharedPref(appContext);
+        BooksController controller = BooksController.getInstance(appContext);
 
         // Construct the RemoteViews object
         RemoteViews rootView = new RemoteViews(context.getPackageName(), R.layout.books_player_app_widget);
@@ -90,7 +86,7 @@ public class BooksPlayerAppWidget extends AppWidgetProvider {
         boolean updated = false;
         String bookId = pref.getString(appWidgetId+"", null);
         if(bookId != null){
-            Book lastBook = database.get(bookId);
+            Book lastBook = controller.get(bookId);
             if(lastBook != null){
                 updated = true;
                 addCoverImage(rootView, lastBook);
@@ -108,8 +104,16 @@ public class BooksPlayerAppWidget extends AppWidgetProvider {
         }
 
         //Callbacks
-        rootView.setOnClickPendingIntent(R.id.action_play, getPendingSelfIntent(context, OnClickPlay));
-        rootView.setOnClickPendingIntent(R.id.action_launch, getPendingSelfIntent(context, OnClickLaunch));
+        Intent intent = new Intent(context, AudioService.class);
+        intent.setAction("ACTION_TOGGLE");
+        PendingIntent pendingIntent = PendingIntent.getService(context, 1, intent, 0);
+        rootView.setOnClickPendingIntent(R.id.action_play, pendingIntent);
+
+        //rootView.setOnClickPendingIntent(R.id.action_play, getPendingSelfIntent(context, OnClickPlay));
+
+        Intent start = new Intent(context, BookListActivity.class);
+        PendingIntent startPending = PendingIntent.getService(context, 1, start, 0);
+        rootView.setOnClickPendingIntent(R.id.action_launch, startPending);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, rootView);

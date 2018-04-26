@@ -2,13 +2,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="org.upv.audiolibros.view.BookListActivity">
-    <item
+    tools:context="org.upv.audiolibros.view.list.ui.BookListActivity">
+    <!--item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings_24dp"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" /-->
 
     <item
         android:id="@+id/action_last_read"

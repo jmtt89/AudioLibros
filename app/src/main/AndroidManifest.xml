@@ -24,25 +24,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.BookListActivity"
+            android:name=".view.list.ui.BookListActivity"
             android:label="@string/title_book_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".view.BookDetailActivity"
+            android:name=".view.detail.ui.BookDetailActivity"
             android:label="@string/title_book_detail"
-            android:parentActivityName=".view.BookListActivity"
+            android:parentActivityName=".view.list.ui.BookListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.upv.audiolibros.view.BookListActivity" />
+                android:value="org.upv.audiolibros.view.list.ui.BookListActivity" />
         </activity>
         <activity
             android:name=".view.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".view.BookListActivity">
+            android:parentActivityName=".view.list.ui.BookListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.upv.audiolibros.view.BookListActivity" />
+                android:value="org.upv.audiolibros.view.list.ui.BookListActivity" />
         </activity>
 
         <receiver android:name=".widget.BooksPlayerAppWidget">

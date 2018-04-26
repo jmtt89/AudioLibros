@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="org.upv.audiolibros.view.BookDetailActivity"
+    tools:context="org.upv.audiolibros.view.detail.ui.BookDetailActivity"
     tools:ignore="MergeRootFrame">
 
     <android.support.design.widget.AppBarLayout
@@ -48,6 +48,6 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@+id/book_detail_container"
         app:layout_anchorGravity="top|end"
-        app:srcCompat="@android:drawable/stat_notify_chat" />
+        app:srcCompat="@drawable/ic_action_play" />
 
 </android.support.design.widget.CoordinatorLayout>

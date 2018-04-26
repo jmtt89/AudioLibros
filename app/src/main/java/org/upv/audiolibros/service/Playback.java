@@ -1,8 +1,6 @@
 package org.upv.audiolibros.service;
 
 
-import android.support.v4.media.session.MediaSessionCompat;
-
 import org.upv.audiolibros.model.Book;
 
 public interface Playback {
@@ -36,13 +34,13 @@ public interface Playback {
     /**
      * @param book to play
      */
-    void play(Book book);
+    void load(Book book);
 
     /**
      * @param book to play
      * @param reset true to always start from beginning
      */
-    void play(Book book, boolean reset);
+    void play();
 
     /**
      * Pause the current playing item

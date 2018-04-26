@@ -14,13 +14,23 @@ import java.util.List;
 
 
 public class BooksDatabaseSharedPref implements BooksDatabase {
+    private static BooksDatabase self;
     private final String TAG = "BOOK_DB_PREF";
     private final String DB_NAME = "Books";
     private HashMap<String, Book> MAP;
     private SharedPreferences preferences;
+    private SharedPreferences lastBookPreference;
 
-    public BooksDatabaseSharedPref(Context context) {
+    public static BooksDatabase getInstance(Context context){
+        if(self == null){
+            self = new BooksDatabaseSharedPref(context);
+        }
+        return self;
+    }
+
+    private BooksDatabaseSharedPref(Context context) {
         this.preferences = context.getSharedPreferences(DB_NAME, Context.MODE_PRIVATE);
+        this.lastBookPreference = context.getSharedPreferences("LastBooks", Context.MODE_PRIVATE);
         MAP = new HashMap<>();
         if(preferences.getAll().isEmpty()){
             for (Book book: Book.loadInitData()) {
@@ -46,7 +56,7 @@ public class BooksDatabaseSharedPref implements BooksDatabase {
         } catch (JSONException e) {
             Log.e(TAG, "get: ", e);
         }
-        return null;
+        return Book.BOOK_EMPTY;
     }
 
     @Override
@@ -89,5 +99,23 @@ public class BooksDatabaseSharedPref implements BooksDatabase {
     public void delete(String id) {
         MAP.remove(id);
         preferences.edit().remove(id).apply();
+    }
+
+    @Override
+    public boolean hasLastBook() {
+        return lastBookPreference.contains("LAST_BOOK");
+    }
+
+    @Override
+    public void setLastBookId(String bookId) {
+        SharedPreferences.Editor editor = lastBookPreference.edit();
+        editor.putString("LAST_BOOK", bookId);
+        editor.apply();
+    }
+
+    @Override
+    public Book getLastBook() {
+        String id = lastBookPreference.getString("LAST_BOOK", null);
+        return get(id);
     }
 }

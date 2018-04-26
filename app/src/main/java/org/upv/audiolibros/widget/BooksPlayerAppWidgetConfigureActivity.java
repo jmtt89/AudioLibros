@@ -1,6 +1,5 @@
 package org.upv.audiolibros.widget;
 
-import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
@@ -13,18 +12,16 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 
 import org.upv.audiolibros.AudioBooks;
 import org.upv.audiolibros.R;
-import org.upv.audiolibros.database.BooksDatabase;
+import org.upv.audiolibros.controller.BooksController;
 import org.upv.audiolibros.model.Book;
-import org.upv.audiolibros.view.BookListActivity;
 
 public class BooksPlayerAppWidgetConfigureActivity extends AppCompatActivity {
     private static final String TAG = "ConfigureWidget";
     private SharedPreferences appPreferences;
-    private BooksDatabase database;
+    private BooksController controller;
     private RecyclerView.Adapter adapter;
 
     int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
@@ -79,7 +76,7 @@ public class BooksPlayerAppWidgetConfigureActivity extends AppCompatActivity {
 
         setContentView(R.layout.books_player_app_widget_configure);
 
-        database = ((AudioBooks) getApplication()).getDatabase();
+        controller = ((AudioBooks) getApplication()).getBooksController();
         appPreferences =  ((AudioBooks) getApplication()).getAppPreferences();
 
         setupToolbar();
@@ -97,7 +94,7 @@ public class BooksPlayerAppWidgetConfigureActivity extends AppCompatActivity {
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         AudioBooks app = (AudioBooks) getApplication();
-        adapter = new BooksConfigureRecyclerViewAdapter(app.getImageLoader(), database, mOnClickListener);
+        adapter = new BooksConfigureRecyclerViewAdapter(app.getImageLoader(), controller, mOnClickListener);
 
         recyclerView.setAdapter(adapter);
         RecyclerView.LayoutManager manager;

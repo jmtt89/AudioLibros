@@ -4,13 +4,15 @@ import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.upv.audiolibros.R;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class Book {
+    public final static Book BOOK_EMPTY = new Book("", "anónimo",
+            "http://www.dcomg.upv.es/~jtomas/android/audiolibros/sin_portada.jpg",
+            "", Genre.ALL, true, false);
     private String id;
     private String title;
     private String author;
@@ -51,6 +53,38 @@ public class Book {
         this.leido = json.optBoolean("leido");
         this.vibrantColor = json.optInt("vibrantColor", -1);
         this.mutedColor = json.optInt("mutedColor", -1);
+    }
+
+    private Book(Builder builder) {
+        setId(builder.id);
+        setTitle(builder.title);
+        setAuthor(builder.author);
+        setUrlCover(builder.urlCover);
+        setUrlAudio(builder.urlAudio);
+        setGenre(builder.genre);
+        setNovedad(builder.novedad);
+        setLeido(builder.leido);
+        setVibrantColor(builder.vibrantColor);
+        setMutedColor(builder.mutedColor);
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static Builder newBuilder(Book copy) {
+        Builder builder = new Builder();
+        builder.id = copy.getId();
+        builder.title = copy.getTitle();
+        builder.author = copy.getAuthor();
+        builder.urlCover = copy.getUrlCover();
+        builder.urlAudio = copy.getUrlAudio();
+        builder.genre = copy.getGenre();
+        builder.novedad = copy.getNovedad();
+        builder.leido = copy.getLeido();
+        builder.vibrantColor = copy.getVibrantColor();
+        builder.mutedColor = copy.getMutedColor();
+        return builder;
     }
 
     public enum Genre{
@@ -201,32 +235,102 @@ public class Book {
 
         books.add(new Book("Kappa", "Akutagawa",
                 server+"kappa.jpg", server+"kappa.mp3",
-                Book.Genre.XIX, false, false));
+                Genre.XIX, false, false));
 
         books.add(new Book("Avecilla", "Alas Clarín, Leopoldo",
                 server+"avecilla.jpg", server+"avecilla.mp3",
-                Book.Genre.XIX, true, false));
+                Genre.XIX, true, false));
 
         books.add(new Book("Divina Comedia", "Dante",
                 server+"divina_comedia.jpg", server+"divina_comedia.mp3",
-                Book.Genre.EPIC, true, false));
+                Genre.EPIC, true, false));
 
         books.add(new Book("Viejo Pancho, El", "Alonso y Trelles, José",
                 server+"viejo_pancho.jpg", server+"viejo_pancho.mp3",
-                Book.Genre.XIX, true, true));
+                Genre.XIX, true, true));
 
         books.add(new Book("Canción de Rolando", "Anónimo",
                 server+"cancion_rolando.jpg", server+"cancion_rolando.mp3",
-                Book.Genre.EPIC, false, true));
+                Genre.EPIC, false, true));
 
         books.add(new Book("Matrimonio de sabuesos", "Agata Christie",
                 server+"matrim_sabuesos.jpg",server+"matrim_sabuesos.mp3",
-                Book.Genre.SUSPENSE, false, true));
+                Genre.SUSPENSE, false, true));
 
         books.add(new Book("La iliada", "Homero",
                 server+"la_iliada.jpg", server+"la_iliada.mp3",
-                Book.Genre.EPIC, true, false));
+                Genre.EPIC, true, false));
 
         return books;
+    }
+
+    public static final class Builder {
+        private String id;
+        private String title;
+        private String author;
+        private String urlCover;
+        private String urlAudio;
+        private Genre genre;
+        private Boolean novedad;
+        private Boolean leido;
+        private int vibrantColor;
+        private int mutedColor;
+
+        private Builder() {
+        }
+
+        public Builder withId(String val) {
+            id = val;
+            return this;
+        }
+
+        public Builder withTitle(String val) {
+            title = val;
+            return this;
+        }
+
+        public Builder withAuthor(String val) {
+            author = val;
+            return this;
+        }
+
+        public Builder withUrlCover(String val) {
+            urlCover = val;
+            return this;
+        }
+
+        public Builder withUrlAudio(String val) {
+            urlAudio = val;
+            return this;
+        }
+
+        public Builder withGenre(Genre val) {
+            genre = val;
+            return this;
+        }
+
+        public Builder withNovedad(Boolean val) {
+            novedad = val;
+            return this;
+        }
+
+        public Builder withLeido(Boolean val) {
+            leido = val;
+            return this;
+        }
+
+        public Builder withVibrantColor(int val) {
+            vibrantColor = val;
+            return this;
+        }
+
+        public Builder withMutedColor(int val) {
+            mutedColor = val;
+            return this;
+        }
+
+        public Book build() {
+            return new Book(this);
+        }
     }
 }

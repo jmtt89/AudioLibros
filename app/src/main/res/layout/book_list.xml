@@ -7,13 +7,13 @@
     android:layout_height="match_parent"
     android:background="#ffffff"
     android:name="org.upv.audiolibros.BookListFragment"
-    tools:context="org.upv.audiolibros.view.BookListActivity">
+    tools:context="org.upv.audiolibros.view.list.ui.BookListActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/book_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="GridLayoutManager"
+        app:layoutManager="android.support.v7.widget.GridLayoutManager"
         tools:listitem="@layout/book_list_content" />
 
 </android.support.v4.widget.NestedScrollView>

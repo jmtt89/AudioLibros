@@ -1,19 +1,14 @@
 package org.upv.audiolibros.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
-
-import org.upv.audiolibros.AudioBooks;
 import org.upv.audiolibros.MediaPlayerNotification;
-import org.upv.audiolibros.R;
-import org.upv.audiolibros.database.BooksDatabase;
 import org.upv.audiolibros.model.Book;
 
 import java.io.IOException;
@@ -25,10 +20,9 @@ public class AudioService extends Service implements Playback {
     // Binder given to clients
     private LocalBinder mBinder = new LocalBinder();
     private MediaPlayer player;
-    private BooksDatabase database;
-    private Book lastBook = null;
-    private Book actualBook = null;
+    private Book actualBook = Book.BOOK_EMPTY;
     private int lastBookPos;
+    @Nullable
     private Callback callback;
 
     public class LocalBinder extends Binder {
@@ -42,7 +36,6 @@ public class AudioService extends Service implements Playback {
         super.onCreate();
         player = new MediaPlayer();
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        database = ((AudioBooks) getApplication()).getDatabase();
     }
 
     @Override
@@ -53,13 +46,16 @@ public class AudioService extends Service implements Playback {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         handleIntent(intent);
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
-    private void play(final Book book, final OnAudioServiceListener listener){
+    @Override
+    public void load(final Book book){
         if(player.isPlaying()){
             player.stop();
         }
+        this.actualBook = Book.BOOK_EMPTY;
+        lastBookPos = 0;
         player.reset();
 
         String streamUrl = book.getUrlAudio();
@@ -69,19 +65,10 @@ public class AudioService extends Service implements Playback {
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
-                    MediaPlayerNotification.notify(getApplicationContext(), book, true);
-                    if(lastBook == book && lastBookPos > 0){
-                        player.seekTo(lastBookPos);
+                    actualBook  = book;
+                    if (callback != null) {
+                        callback.onCompletion();
                     }
-                    player.start();
-                    lastBook = book;
-                    actualBook = book;
-                    getApplicationContext()
-                            .getSharedPreferences("SESSION", Context.MODE_PRIVATE)
-                            .edit()
-                            .putString("LAST_STATION_ID", book.getId())
-                            .apply();
-                    listener.callback(true);
                 }
             });
 
@@ -89,10 +76,9 @@ public class AudioService extends Service implements Playback {
                 @Override
                 public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
                     Log.e("ERROR","Error Playing Station");
-                    lastBook = null;
-                    actualBook = null;
-                    Toast.makeText(getApplicationContext(), R.string.error_playing, Toast.LENGTH_LONG).show();
-                    listener.callback(false);
+                    if (callback != null) {
+                        callback.onError("Error Playing");
+                    }
                     return true;
                 }
             });
@@ -101,40 +87,38 @@ public class AudioService extends Service implements Playback {
 
         } catch (IOException e) {
             Log.e(TAG, "play: ", e);
-            callback.onError(e.getLocalizedMessage());
+            if (callback != null) {
+                callback.onError(e.getLocalizedMessage());
+            }
         }
 
     }
 
-    public void play(String bookId){
-        if(bookId == null){
-            return;
+    @Override
+    public void play() {
+        if(!Book.BOOK_EMPTY.equals(actualBook) && !player.isPlaying()){
+            player.seekTo(lastBookPos);
+            start();
         }
-        //GetBook
-        final Book book = database.get(bookId);
-        //Reproduce
-        play(book, new OnAudioServiceListener() {
-            @Override
-            public void callback(boolean success) {
-                if(success){
-                    MediaPlayerNotification.notify(getApplicationContext(), book, true);
-                    callback.onCompletion();
-                }else{
-                    callback.onError("Error in Playing");
-                }
-            }
-        });
     }
 
     @Override
     public void start() {
         player.start();
+        MediaPlayerNotification.notify(getApplicationContext(), actualBook, true);
+        if (callback != null) {
+            callback.onPlaybackStatusChanged(1);
+        }
     }
 
     @Override
     public void stop() {
-        actualBook = null;
         player.stop();
+        actualBook = Book.BOOK_EMPTY;
+        lastBookPos = 0;
+        if (callback != null) {
+            callback.onPlaybackStatusChanged(-1);
+        }
     }
 
     @Override
@@ -153,30 +137,13 @@ public class AudioService extends Service implements Playback {
     }
 
     @Override
-    public void play(Book book) {
-        play(book, false);
-    }
-
-    @Override
-    public void play(final Book book, boolean reset) {
-        play(book, new OnAudioServiceListener() {
-            @Override
-            public void callback(boolean success) {
-                if(success){
-                    MediaPlayerNotification.notify(getApplicationContext(), book, true);
-                    callback.onCompletion();
-                }else{
-                    callback.onError("Error playing audio");
-                }
-            }
-        });
-    }
-
-    @Override
     public void pause(){
-        actualBook = null;
         lastBookPos = player.getCurrentPosition();
         player.pause();
+        MediaPlayerNotification.notify(getApplicationContext(), actualBook, false);
+        if (callback != null) {
+            callback.onPlaybackStatusChanged(0);
+        }
     }
 
     @Override
@@ -184,54 +151,55 @@ public class AudioService extends Service implements Playback {
         player.pause();
         player.seekTo(position);
         player.start();
-//        player.seekTo(position);
     }
 
     @Override
-    public void setCallback(Callback callback) {
+    public void setCallback(@Nullable Callback callback) {
         this.callback = callback;
     }
 
     private void handleIntent(Intent intent){
-        if (intent == null || intent.getAction() == null) {
-            return;
-        }
 
-        String id = null;
-        if(intent.getExtras() != null){
-            id = intent.getExtras().getString(ARG_BOOK_ID, null);
-        }
-
-        if(id == null){
-            if(lastBook == null){
-                id = getApplicationContext()
-                        .getSharedPreferences("SESSION", Context.MODE_PRIVATE)
-                        .getString("LAST_STATION_ID", null);
+        if(Book.BOOK_EMPTY.equals(actualBook)){
+            String id = null;
+            if(intent.getExtras() != null){
+                id = intent.getExtras().getString(ARG_BOOK_ID, null);
+            }
+            if(id != null) {
+                loadAndPlay(id);
+            } else {
+                Log.w(TAG, "handleIntent: No Book Id provided");
+                return;
             }
         }
 
         String action = intent.getAction();
+        if(action == null){
+            Log.w(TAG, "handleIntent: Action is null");
+            return;
+        }
         switch (action){
-            case "ACTION_PLAY":
-                if(id != null){
-                    play(id);
+            case "ACTION_TOGGLE":
+                if(isPlaying()){
+                    pause();
                 } else {
-                    play(lastBook);
+                    play();
                 }
+                break;
+            case "ACTION_PLAY":
+                play();
                 break;
             case "ACTION_STOP":
                 pause();
-                if(lastBook != null){
-                    MediaPlayerNotification.notify(getApplicationContext(), lastBook, false);
-                }
                 break;
             case "ACTION_DELETE":
-                pause();
+                stop();
                 break;
         }
     }
 
-    private interface OnAudioServiceListener {
-        void callback(boolean success);
+    //TODO: Terminar la implementacion de cargar y darle play
+    private void loadAndPlay(String id) {
+
     }
 }

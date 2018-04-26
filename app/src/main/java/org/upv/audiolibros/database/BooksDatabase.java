@@ -12,4 +12,8 @@ public interface BooksDatabase {
 
     void save(Book book);
     void delete(String id);
+
+    boolean hasLastBook();
+    void setLastBookId(String bookId);
+    Book getLastBook();
 }

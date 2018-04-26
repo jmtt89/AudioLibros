@@ -2,10 +2,11 @@ package org.upv.audiolibros.view;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import org.upv.audiolibros.R;
+import org.upv.audiolibros.view.list.ui.BookListActivity;
 
 public class SplashActivity extends AppCompatActivity {
 

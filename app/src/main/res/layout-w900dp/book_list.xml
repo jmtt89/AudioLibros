@@ -8,7 +8,7 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context="org.upv.audiolibros.view.BookListActivity">
+    tools:context="org.upv.audiolibros.view.list.ui.BookListActivity">
 
     <!--
     This layout is a two-pane layout for the Books
@@ -22,7 +22,7 @@
         android:layout_width="@dimen/item_width"
         android:layout_height="match_parent"
         app:layoutManager="LinearLayoutManager"
-        tools:context="org.upv.audiolibros.view.BookListActivity"
+        tools:context="org.upv.audiolibros.view.list.ui.BookListActivity"
         tools:listitem="@layout/book_list_content" />
 
     <FrameLayout
